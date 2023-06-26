@@ -1,19 +1,23 @@
 import streamlit as st
 import MeCab
-from google.oauth2 import service_account #jsonファイルを直接指定
+from google.oauth2 import service_account
 from google.cloud import translate_v2 as translate
 import alkana
-from dotenv import load_dotenv
-import os
-import json
 
-load_dotenv()
 
-# 文字列として取得
-service_account_info_str = os.getenv("SERVICE_ACCOUNT_INFO")
+# sectetsのAPIキーを変数に格納
+type = st.secrets["SERVICE_ACCOUNT_INFO"]["type"]
+project_id = st.secrets["SERVICE_ACCOUNT_INFO"]["project_id"]
+private_key_id = st.secrets["SERVICE_ACCOUNT_INFO"]["private_key_id"]
+private_key = st.secrets["SERVICE_ACCOUNT_INFO"]["private_key"]
+client_email = st.secrets["SERVICE_ACCOUNT_INFO"]["client_email"]
+client_id = st.secrets["SERVICE_ACCOUNT_INFO"]["client_id"]
+auth_uri = st.secrets["SERVICE_ACCOUNT_INFO"]["auth_uri"]
+token_uri = st.secrets["SERVICE_ACCOUNT_INFO"]["token_uri"]
+auth_provider_x509_cert_url = st.secrets["SERVICE_ACCOUNT_INFO"]["auth_provider_x509_cert_url"]
+client_x509_cert_url = st.secrets["SERVICE_ACCOUNT_INFO"]["client_x509_cert_url"]
+universe_domain = st.secrets["SERVICE_ACCOUNT_INFO"]["universe_domain"]
 
-# JSONに変換
-service_account_info = json.loads(service_account_info_str)
 
 ## textから名詞を抽出する関数
 def get_nouns(text):
@@ -31,14 +35,26 @@ def get_nouns(text):
     return nouns
 
 
+# APIキーを設定
 @st.cache_resource
 def get_translate_client():
+    service_account_info = {
+        "type": st.secrets["SERVICE_ACCOUNT_INFO"]["type"],
+        "project_id": st.secrets["SERVICE_ACCOUNT_INFO"]["project_id"],
+        "private_key_id": st.secrets["SERVICE_ACCOUNT_INFO"]["private_key_id"],
+        "private_key": st.secrets["SERVICE_ACCOUNT_INFO"]["private_key"],
+        "client_email": st.secrets["SERVICE_ACCOUNT_INFO"]["client_email"],
+        "client_id": st.secrets["SERVICE_ACCOUNT_INFO"]["client_id"],
+        "auth_uri": st.secrets["SERVICE_ACCOUNT_INFO"]["auth_uri"],
+        "token_uri": st.secrets["SERVICE_ACCOUNT_INFO"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["SERVICE_ACCOUNT_INFO"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["SERVICE_ACCOUNT_INFO"]["client_x509_cert_url"],
+        "universe_domain": st.secrets["SERVICE_ACCOUNT_INFO"]["universe_domain"]
+    }
+    
     credentials = service_account.Credentials.from_service_account_info(service_account_info)
     return translate.Client(credentials=credentials)
 
-# jsonファイル記入前
-# def get_translate_client():
-#     return translate.Client()
 
 ## nounsを英語に翻訳する関数
 def translated_nouns(nouns):
@@ -50,7 +66,6 @@ def translated_nouns(nouns):
       translated_nouns.append(result['translatedText'])
 
   return translated_nouns
-
 
 
 ## translated_nounsをカタカナにする関数

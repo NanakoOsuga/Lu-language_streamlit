@@ -1,5 +1,5 @@
 import streamlit as st
-import MeCab
+from janome.tokenizer import Tokenizer
 from google.oauth2 import service_account
 from google.cloud import translate_v2 as translate
 import alkana
@@ -21,17 +21,9 @@ universe_domain = st.secrets["SERVICE_ACCOUNT_INFO"]["universe_domain"]
 
 ## textから名詞を抽出する関数
 def get_nouns(text):
-    mecab = MeCab.Tagger('-Owakati')
-    mecab = MeCab.Tagger('-ochasen')
-    nouns = []
-    res = mecab.parse(text)
-    words = res.split('\n')[:-2]
-    for word in words:
-        part = word.split('\t')
-        # ↓ここから
-        pos = part[1].split(',')
-        if '名詞' in pos[0]: # 品詞情報が含まれている要素を探す
-            nouns.append(part[0])
+    t = Tokenizer()
+    tokens = t.tokenize(text)
+    nouns = [token.surface for token in tokens if token.part_of_speech.split(',')[0] == '名詞']
     return nouns
 
 
@@ -96,14 +88,9 @@ def process_text(text):
 
 # textの単語を抽出してリスト化する関数
 def get_words(text):
-    mecab = MeCab.Tagger('-Owakati')
-    mecab = MeCab.Tagger('-ochasen')
-    words = []
-    res = mecab.parse(text)
-    lines = res.split('\n')[:-2]
-    for line in lines:
-        part = line.split('\t')
-        words.append(part[0])
+    t = Tokenizer()
+    tokens = t.tokenize(text)
+    words = [token.surface for token in tokens]
     return words
 
 

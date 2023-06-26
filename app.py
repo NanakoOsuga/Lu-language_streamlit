@@ -1,5 +1,5 @@
 import streamlit as st
-import MeCab
+from janome.tokenizer import Tokenizer
 from google.cloud import translate_v2 as translate
 import alkana
 from main import replace_words_with_translation
@@ -20,4 +20,4 @@ if text:
 # set GOOGLE_APPLICATION_CREDENTIALS="PATH"
 # export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 # pip install -U alkana
-# pip install mecab
+# pip install janome

@@ -1,5 +1,5 @@
 streamlit
-mecab-python3
+janome
 google-auth
 google-auth-httplib2
 google-auth-oauthlib
